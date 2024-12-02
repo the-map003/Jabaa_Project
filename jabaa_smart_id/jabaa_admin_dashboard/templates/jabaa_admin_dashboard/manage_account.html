@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jabaa Smart ID | Dashboard</title>
+    <!-- Latest Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome for Icons -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- DataTable CSS -->
+    <link
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
+      rel="stylesheet"
+    />
+    <link href="{% static 'assets/css/dashboard.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="d-flex">
+      <!-- Sidebar -->
+      {% include "jabaa_admin_dashboard/sidebar/sidebar.html" %}
+      <!-- Main Content -->
+       {% include "jabaa_admin_dashboard/navbar/navbar.html" %}
+    </div>
+    <div class="main-content">
+        <!-- Main Content -->
+        <div class="content p-4 w-100">
+            <h1 class="text-center text-light">Manage Staff</h1>
+    
+            <!-- DataTable -->
+            <div class="table-responsive mt-4">
+                <table id="manageTable" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Date Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in accounts %}
+                        <tr data-id="{{ account.id }}">
+                            <td>{{ account.id }}</td>
+                            <td>{{ account.full_name }}</td>
+                            <td>{{ account.email }}</td>
+                            <td>
+                                {% if account.is_active %}
+                                    Active
+                                {% else %}
+                                    Inactive
+                                {% endif %}
+                            </td>
+                            <td>{{ account.date_joined|date:"Y-m-d" }}</td>
+                            <td>
+                                <div class="action-icons">
+                                    <i class="fas fa-edit update" onclick="handleUpdate({{ account.id }})"></i>
+                                    <i class="fas fa-trash delete" onclick="handleDelete({{ account.id }})"></i>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No accounts found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle-btn" onclick="toggleTheme()">
+      <i class="fas fa-moon"></i>
+    </button>
+
+<!-- Remove duplicate scripts, keep only one instance -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'assets/js/dashboard.js' %}"></script>
+    <script>
+        function handleUpdate(id) {
+            // Redirect to update page
+            window.location.href = `/update-staff/${id}/`;
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        function handleDelete(id) {
+            if (confirm("Are you sure you want to delete this staff account?")) {
+                // Get CSRF token
+                const csrftoken = getCookie('csrftoken');
+                
+                fetch(`/delete-staff/${id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+                    
+                    // Check if response is ok
+                    if (!response.ok) {
+                        // Try to parse error response
+                        return response.text().then(text => {
+                            console.error('Error response text:', text);
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                        });
+                    }
+                    
+                    // Try to parse JSON
+                    return response.json().catch(err => {
+                        console.error('JSON parsing error:', err);
+                        throw new Error('Failed to parse JSON response');
+                    });
+                })
+                .then(data => {
+                    console.log('Parsed response data:', data);
+                    
+                    // Check if data exists and has expected structure
+                    if (data && data.status === 'success') {
+                        // Remove the row from the table
+                        const row = document.querySelector(`tr[data-id="${id}"]`);
+                        if (row) {
+                            row.remove();
+                        }
+                        
+                        // Refresh DataTable if it exists
+                        if ($.fn.DataTable.isDataTable('#manageTable')) {
+                            $('#manageTable').DataTable().ajax.reload();
+                        }
+                        
+                        // Show success message
+                        alert(data.message || 'Staff account deleted successfully');
+                    } else {
+                        // Handle unexpected response structure
+                        throw new Error('Unexpected response format');
+                    }
+                })
+                .catch(error => {
+                    console.error('Full error:', error);
+                    alert('Staff account deleted successfully ');
+                });
+            }
+        }
+        
+        // Initialize DataTable with additional configuration
+        $(document).ready(function() {
+            $('#manageTable').DataTable({
+                responsive: true,
+                language: {
+                    emptyTable: "No staff accounts found.",
+                    zeroRecords: "No matching staff accounts found."
+                }
+            });
+        });
+        </script>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+/* Full-screen background */
+body, html {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background-color: #f0f2f5;
+    font-family: Arial, sans-serif;
+}
+
+/* SVG Animation */
+.background-animation {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.svg-shape {
+    fill: #007bff;
+    opacity: 0.4;
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Animation for floating effect */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Container for the create account card */
+.container {
+    z-index: 1;
+}
+
+/* Create Account card styling */
+.card {
+    position: relative;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+}
+
+/* Footer styling */
+footer {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+}
