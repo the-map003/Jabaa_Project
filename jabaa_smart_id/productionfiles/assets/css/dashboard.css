@@ -1,0 +1,132 @@
+
+:root {
+    --discord-bg: #2c2f33;
+    --discord-sidebar-bg: #23272a;
+    --discord-accent: #5865f2;
+    --discord-hover: #40444b;
+    --discord-text: #ffffff;
+  }
+
+  body {
+    background-color: var(--discord-bg);
+    color: var(--discord-text);
+    font-family: "Arial", sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+  }
+
+  .sidebar {
+    background-color: var(--discord-sidebar-bg);
+    color: var(--discord-text);
+    width: 250px;
+    padding: 1rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    top: 0;
+  }
+
+  .sidebar h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--discord-accent);
+  }
+
+  .sidebar .nav-link {
+    color: var(--discord-text);
+    border-radius: 4px;
+    padding: 0.75rem;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+
+  .sidebar .nav-link.active,
+  .sidebar .nav-link:hover {
+    background-color: var(--discord-hover);
+    transform: scale(1.05);
+  }
+
+  .profile {
+    background-color: var(--discord-hover);
+    padding: 0.75rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+  }
+
+  .profile img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+  }
+
+  .profile span {
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  .main-content {
+    margin-left: 250px;
+    padding: 2rem;
+    flex-grow: 1;
+  }
+
+  .welcome-section {
+    background: linear-gradient(135deg, #5865f2, #23272a);
+    color: var(--discord-text);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .news-section {
+    background-color: var(--discord-hover);
+    color: var(--discord-text);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .theme-toggle-btn {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    background-color: var(--discord-accent);
+    color: var(--discord-text);
+    border: none;
+    border-radius: 50%;
+    padding: 0.75rem;
+  }
+
+  .table-responsive {
+    margin-top: 2rem;
+  }
+
+  .dataTables_wrapper .dataTables_filter input {
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-left: 1rem;
+    width: 200px;
+  }
+
+  .dataTables_length select {
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-left: 1rem;
+  }
+
+  .dataTables_info {
+    margin-top: 10px;
+  }
