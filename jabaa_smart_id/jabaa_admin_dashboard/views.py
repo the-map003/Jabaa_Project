@@ -128,7 +128,6 @@ def login_view(request):
 
     return render(request, "jabaa_admin_dashboard/login.html")
 
-@login_required
 def dashboard(request):
     # Check if it's a session-based login or Django auth login
     if 'user_id' in request.session:
