@@ -147,7 +147,6 @@ def dashboard(request):
     
     return render(request, 'jabaa_admin_dashboard/dashboard.html', context)
 
-@login_required
 def logout_view(request):
     # Clear all session data
     request.session.flush()
@@ -254,7 +253,6 @@ def delete_staff(request, staff_id):
             'message': str(e)
         }, status=400)
 
-@login_required
 def add_citizen(request):
     if request.method == 'POST':
         full_name = request.POST.get('fullName')
@@ -292,7 +290,6 @@ def add_citizen(request):
 
     return render(request, 'jabaa_admin_dashboard/add_citizen.html')
 
-@login_required
 def manage_citizen(request, citizen_id=None):
     if citizen_id:
         citizen = get_object_or_404(Citizen, id=citizen_id)
@@ -308,7 +305,6 @@ def manage_citizen(request, citizen_id=None):
     return render(request, 'jabaa_admin_dashboard/manage_citizen.html', context)
 
 
-@login_required
 def edit_citizen(request, citizen_id):
     citizen = get_object_or_404(Citizen, id=citizen_id)
 
@@ -331,7 +327,6 @@ def edit_citizen(request, citizen_id):
 
     return render(request, 'jabaa_admin_dashboard/edit_citizen.html', {'citizen': citizen})
 
-@login_required
 @csrf_exempt
 def delete_citizen(request, citizen_id):
     if request.method == 'POST':
