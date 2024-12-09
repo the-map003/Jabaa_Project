@@ -32,68 +32,7 @@
         <div class="card shadow-lg mx-auto my-4" style="max-width: 1000px">
           <h2 class="text-center text-light">Update Staff</h2>      
           <div class="container d-flex justify-content-center align-items-center vh-100">
-            <div class="card p-4 shadow" style="width: 100%; max-width: 500px">
-      
-                <form method="POST">
-                    {% csrf_token %}
-                    <!-- Full Name input -->
-                    <div class="mb-3">
-                        <label for="fullName" class="form-label">Full Name</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="fullName"
-                            name="fullName"
-                            value="{{ account.full_name }}"
-                            placeholder="Enter your full name"
-                            required
-                        />
-                    </div>
-                
-                    <!-- Email input -->
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input
-                            type="email"
-                            class="form-control"
-                            id="email"
-                            name="email"
-                            value="{{ account.email }}"
-                            placeholder="Enter your email"
-                            required
-                        />
-                    </div>
-                
-                    <!-- Password input -->
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Old Password</label>
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="password"
-                            name="password"
-                            placeholder="Enter your old password"
-                        />
-                    </div>
-                
-                    <!-- Confirm Password input -->
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">New Password</label>
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            placeholder="Enter a new password (optional)"
-                        />
-                    </div>
-                
-                    <!-- Update Account button -->
-                    <button type="submit" class="btn btn-primary w-100">
-                        Update Staff
-                    </button>
-                </form>
-                
+            <div class="card p-4 shadow" style="width: 100%; max-width: 500px">                
             </div>
           </div>
         </div>

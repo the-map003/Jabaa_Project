@@ -15,6 +15,10 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import logging
+logger = logging.getLogger(__name__)
+
 
 def signup_view(request):
     if request.method == "POST":
@@ -308,27 +312,38 @@ def manage_citizen(request, citizen_id=None):
 @login_required
 def edit_citizen(request, citizen_id):
     citizen = get_object_or_404(Citizen, id=citizen_id)
+
     if request.method == 'POST':
+        citizen.full_name = request.POST.get('fullName')
+        citizen.dob = request.POST.get('dob')
+        citizen.gender = request.POST.get('gender')
+        citizen.card_id = request.POST.get('card_id')
+        citizen.contact_number = request.POST.get('contact')
+        citizen.address = request.POST.get('address')
+
         try:
-            citizen.full_name = request.POST.get('fullName')
-            citizen.dob = date.fromisoformat(request.POST.get('dob'))
-            citizen.gender = request.POST.get('gender')
-            citizen.card_id = request.POST.get('card_id')
-            citizen.contact_number = request.POST.get('contact')
-            citizen.address = request.POST.get('address')
             citizen.save()
-            messages.success(request, f"Citizen {citizen.full_name} updated successfully!")
-            return redirect('citizen_list')
+            return redirect('manage_citizen')  
         except Exception as e:
-            messages.error(request, f"Error updating citizen: {str(e)}")
+            return render(request, 'jabaa_admin_dashboard/edit_citizen.html', {
+                'citizen': citizen,
+                'error': str(e)
+            })
+
     return render(request, 'jabaa_admin_dashboard/edit_citizen.html', {'citizen': citizen})
 
 @login_required
+@csrf_exempt
 def delete_citizen(request, citizen_id):
-    try:
+    if request.method == 'POST':
+        logger.info(f"Request to delete citizen with ID {citizen_id}")
         citizen = get_object_or_404(Citizen, id=citizen_id)
-        citizen.delete()
-        return JsonResponse({'status': 'success', 'message': 'Citizen deleted successfully'})
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    
+        try:
+            citizen.delete()
+            return JsonResponse({'status': 'success', 'message': 'Citizen record deleted successfully'})
+        except Exception as e:
+            logger.error(f"Error deleting citizen: {e}")
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    else:
+        logger.warning("Invalid request method for delete_citizen")
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})

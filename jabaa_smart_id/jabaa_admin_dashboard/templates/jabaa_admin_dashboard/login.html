@@ -88,8 +88,8 @@
           <!-- Optional: Forgot password link -->
           <div class="text-center mt-3">
             <a href="#" class="text-decoration-none">Forgot your password?</a>
-            <br />or
-            <a href="{% url 'signup_view' %}" class="text-decoration-none">Sign up here</a>
+            {% comment %} <br />or {% endcomment %}
+            {% comment %} <a href="{% url 'signup_view' %}" class="text-decoration-none">Sign up here</a> {% endcomment %}
           </div>
         </form>
       </div>
