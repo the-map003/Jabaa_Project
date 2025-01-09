@@ -258,9 +258,13 @@ def add_citizen(request):
         full_name = request.POST.get('fullName')
         dob = request.POST.get('dob')
         gender = request.POST.get('gender')
-        card_id = request.POST.get('card_id')
+        card_id = request.POST.get('card_id').strip()
         contact_number = request.POST.get('contact')
         address = request.POST.get('address')
+        
+        if not card_id or not all(c in '0123456789abcdefABCDEF' for c in card_id):
+            messages.error(request, "Invalid card ID format!")
+            return redirect('add_citizen')
 
         # Validate inputs
         if not all([full_name, dob, gender, card_id, contact_number, address]):
