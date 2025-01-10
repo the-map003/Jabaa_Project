@@ -1,0 +1,11 @@
+
+.citizen-info {
+    display: none;
+    transition: all 0.3s ease;
+}
+.citizen-info.visible {
+    display: block;
+}
+.loading {
+    display: none;
+}

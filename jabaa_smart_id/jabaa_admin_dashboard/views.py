@@ -309,6 +309,41 @@ def manage_citizen(request, citizen_id=None):
     return render(request, 'jabaa_admin_dashboard/manage_citizen.html', context)
 
 
+def index(request):
+    citizen = None
+    card_id = request.GET.get('card_id')  # Fetch card ID from query parameters
+    if card_id:
+        try:
+            citizen = get_object_or_404(Citizen, card_id=card_id)
+        except:
+            citizen = None
+
+    return render(request, 'jabaa_admin_dashboard/index.html', {'citizen': citizen})
+
+def get_citizen_data(request):
+    card_id = request.GET.get('card_id')
+    
+    try:
+        citizen = Citizen.objects.get(card_id=card_id)
+        data = {
+            'success': True,
+            'citizen': {
+                'full_name': citizen.full_name,
+                'dob': citizen.dob.strftime('%Y-%m-%d'),
+                'age': citizen.age,
+                'gender': citizen.gender,
+                'contact_number': citizen.contact_number,
+                'address': citizen.address,
+            }
+        }
+    except Citizen.DoesNotExist:
+        data = {
+            'success': False,
+            'error': 'Citizen not found'
+        }
+    
+    return JsonResponse(data)
+
 def edit_citizen(request, citizen_id):
     citizen = get_object_or_404(Citizen, id=citizen_id)
 

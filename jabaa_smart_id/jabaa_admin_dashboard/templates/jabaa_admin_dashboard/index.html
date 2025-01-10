@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Reader - Jabaa Smart ID</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'assets/css/index.css' %}" rel="stylesheet" />
+</head>
+<body class="bg-dark text-light">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Jabaa Smart ID Card Reader</h1>
+        
+        <!-- Card Reader Section -->
+        <div class="card shadow-lg p-4 bg-dark border-light mb-4">
+            <div class="text-center mb-3">
+                <div class="loading spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <input
+                    type="text"
+                    id="card_id"
+                    class="form-control"
+                    placeholder="Waiting for card..."
+                    readonly
+                />
+                <button id="connectReader" class="btn btn-primary">Connect Reader</button>
+            </div>
+            <small id="readerStatus" class="text-warning mt-2">Reader not connected</small>
+        </div>
+        
+        <!-- Citizen Information Display -->
+        <div class="card shadow-lg p-4 bg-dark border-light citizen-info" id="citizenInfo">
+            <h2 class="text-center mb-4">Citizen Information</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="fw-bold">Full Name:</label>
+                        <p id="fullName" class="ms-2"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold">Date of Birth:</label>
+                        <p id="dob" class="ms-2"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold">Age:</label>
+                        <p id="age" class="ms-2"></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="fw-bold">Gender:</label>
+                        <p id="gender" class="ms-2"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold">Contact Number:</label>
+                        <p id="contact" class="ms-2"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="fw-bold">Address:</label>
+                        <p id="address" class="ms-2"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="alert alert-danger mt-4" id="errorMessage" style="display: none;">
+            No citizen found for this card. Please check the card or register the citizen.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const readerStatus = document.getElementById('readerStatus');
+            const cardIdField = document.getElementById('card_id');
+            const connectButton = document.getElementById('connectReader');
+            const citizenInfo = document.getElementById('citizenInfo');
+            const errorMessage = document.getElementById('errorMessage');
+            const loadingSpinner = document.querySelector('.loading');
+            
+            let isPolling = false;
+            let pollInterval;
+            
+            function updateCitizenInfo(data) {
+                document.getElementById('fullName').textContent = data.full_name;
+                document.getElementById('dob').textContent = data.dob;
+                document.getElementById('age').textContent = data.age + ' years';
+                document.getElementById('gender').textContent = data.gender;
+                document.getElementById('contact').textContent = data.contact_number;
+                document.getElementById('address').textContent = data.address;
+            }
+            
+            function startPolling() {
+                // Replace with your ESP8266's IP address
+                const ESP_IP = '192.168.1.XXX';
+                isPolling = true;
+                readerStatus.textContent = 'Reader connected';
+                readerStatus.className = 'text-success mt-2';
+                connectButton.textContent = 'Disconnect Reader';
+                
+                pollInterval = setInterval(() => {
+                    fetch(`http://${ESP_IP}/getcard`)
+                        .then(response => response.text())
+                        .then(cardId => {
+                            if (cardId && cardId !== cardIdField.value) {
+                                cardIdField.value = cardId;
+                                loadingSpinner.style.display = 'block';
+                                citizenInfo.classList.remove('visible');
+                                errorMessage.style.display = 'none';
+                                
+                                // Fetch citizen data
+                                fetch(`/get_citizen_data/?card_id=${cardId}`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        loadingSpinner.style.display = 'none';
+                                        if (data.success) {
+                                            updateCitizenInfo(data.citizen);
+                                            citizenInfo.classList.add('visible');
+                                            errorMessage.style.display = 'none';
+                                        } else {
+                                            citizenInfo.classList.remove('visible');
+                                            errorMessage.style.display = 'block';
+                                        }
+                                    })
+                                    .catch(error => {
+                                        loadingSpinner.style.display = 'none';
+                                        errorMessage.style.display = 'block';
+                                        console.error('Error:', error);
+                                    });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error polling card reader:', error);
+                            stopPolling();
+                        });
+                }, 500);
+            }
+            
+            function stopPolling() {
+                isPolling = false;
+                clearInterval(pollInterval);
+                readerStatus.textContent = 'Reader disconnected';
+                readerStatus.className = 'text-danger mt-2';
+                connectButton.textContent = 'Connect Reader';
+                citizenInfo.classList.remove('visible');
+            }
+            
+            connectButton.addEventListener('click', function() {
+                if (!isPolling) {
+                    startPolling();
+                } else {
+                    stopPolling();
+                }
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
